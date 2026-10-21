@@ -2,13 +2,30 @@
 # urldefrag: removes fragments such as #section1
 # BeautifulSoup: finds links inside HTML
 
+# keeping track of unique pages 
+visited_pages = set() 
+
 import re
 from urllib.parse import urlparse, urljoin, urldefrag
 from bs4 import BeautifulSoup
 
 def scraper(url, resp):
+    # skip pages that didnt download successfully 
+    if resp.status != 200 or resp.raw_response is None: 
+        return [] 
+
+    # removing fragments from the page URL 
+    clean_url = urldefrag(resp.url or url)[0]
+
+    # record page if it hasnt been visted 
+    if clean_url not in visited_pages:
+        visited_pages.add(clean_url)
+
+    # extracting links from this page 
     links = extract_next_links(url, resp)
+
     return [link for link in links if is_valid(link)]
+
 
 def extract_next_links(url, resp):
     # Implementation required.
