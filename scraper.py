@@ -14,6 +14,40 @@ longest_page_words = 0
 # counting how often each word appears 
 word_frequencies = Counter() 
 
+# common English stop words to ignore
+# NLTK's list of english stopwords: https://gist.github.com/sebleier/554280 
+stop_words = {
+    "a", "about", "above", "after", "again", "against",
+    "all", "am", "an", "and", "any", "are", "aren", "aren't",
+    "as", "at", "be", "because", "been", "before", "being",
+    "below", "between", "both", "but", "by", "can", "cannot",
+    "could", "couldn", "couldn't", "d", "did", "didn",
+    "didn't", "do", "does", "doesn", "doesn't", "doing",
+    "don", "don't", "down", "during", "each", "few", "for",
+    "from", "further", "had", "hadn", "hadn't", "has",
+    "hasn", "hasn't", "have", "haven", "haven't", "having",
+    "he", "her", "here", "hers", "herself", "him", "himself",
+    "his", "how", "i", "if", "in", "into", "is", "isn",
+    "isn't", "it", "it's", "its", "itself", "just", "ll",
+    "m", "ma", "me", "mightn", "mightn't", "more", "most",
+    "mustn", "mustn't", "my", "myself", "needn", "needn't",
+    "no", "nor", "not", "now", "o", "of", "off", "on",
+    "once", "only", "or", "other", "our", "ours",
+    "ourselves", "out", "over", "own", "re", "s", "same",
+    "shan", "shan't", "she", "she's", "should", "should've",
+    "shouldn", "shouldn't", "so", "some", "such", "t",
+    "than", "that", "that'll", "the", "their", "theirs",
+    "them", "themselves", "then", "there", "these", "they",
+    "this", "those", "through", "to", "too", "under",
+    "until", "up", "ve", "very", "was", "wasn", "wasn't",
+    "we", "were", "weren", "weren't", "what", "when",
+    "where", "which", "while", "who", "whom", "why",
+    "will", "with", "won", "won't", "would", "wouldn",
+    "wouldn't", "y", "you", "you'd", "you'll", "you're",
+    "you've", "your", "yours", "yourself", "yourselves"
+}
+
+
 import re
 from urllib.parse import urlparse, urljoin, urldefrag
 from bs4 import BeautifulSoup
@@ -48,8 +82,14 @@ def scraper(url, resp):
         # converting text to lowercase and find words 
         clean_words = re.findall(r"[a-z0-9]+", text.lower())
 
+        # removing common english stop words 
+        filtered_words = [
+            word for word in clean_words 
+            if word not in stop_words
+        ]
+
         # counting the words from this page 
-        word_frequencies.update(clean_words)
+        word_frequencies.update(filtered_words)
 
         # saving the page if its the longest so far 
         if word_count > longest_page_words: 
