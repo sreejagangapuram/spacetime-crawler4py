@@ -23,6 +23,28 @@ def is_valid(url):
     # There are already some conditions that return False.
     try:
         parsed = urlparse(url)
+
+        # only allow links for four required UCI domains 
+        # checking website's hostname before allowing the crawler to visit it 
+        allowed_domains = (
+            "ics.uci.edu",
+            "cs.uci.edu",
+            "informatics.uci.edu", 
+            "stat.uci.edu"
+        )
+
+        hostname = parsed.hostname 
+
+        if not hostname:
+            return False 
+
+        if not any (
+            hostname == domain or hostname.endswith("." + domain)
+            for domain in allowed_domains
+        ):
+
+            return False 
+        
         if parsed.scheme not in set(["http", "https"]):
             return False
         return not re.match(
