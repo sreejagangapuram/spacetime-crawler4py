@@ -1,3 +1,5 @@
+from collections import Counter 
+
 # urljoin: turns relative links into complete URLs
 # urldefrag: removes fragments such as #section1
 # BeautifulSoup: finds links inside HTML
@@ -8,6 +10,9 @@ visited_pages = set()
 # tracking longest page 
 longest_page_url = ""
 longest_page_words = 0
+
+# counting how often each word appears 
+word_frequencies = Counter() 
 
 import re
 from urllib.parse import urlparse, urljoin, urldefrag
@@ -27,23 +32,29 @@ def scraper(url, resp):
     if clean_url not in visited_pages:
         visited_pages.add(clean_url)
 
-    # extracting text from the webpage 
-    soup = BeautifulSoup(resp.raw_response.content, "html.parser") 
+        # extracting text from the webpage 
+        soup = BeautifulSoup(resp.raw_response.content, "html.parser") 
 
-    # removing code and non-visable text 
-    for tag in soup(["script", "style", "noscript"]):
-        tag.decompose()
+        # removing code and non-visable text 
+        for tag in soup(["script", "style", "noscript"]):
+            tag.decompose()
 
-    text = soup.get_text(separator=" ", strip=True)                 
+        text = soup.get_text(separator=" ", strip=True)                 
 
-    # counting the words 
-    words = text.split() 
-    word_count = len(words) 
+        # counting the words 
+        words = text.split() 
+        word_count = len(words) 
 
-    # saving the page if its the longest so far 
-    if word_count > longest_page_words: 
-        longest_page_words = word_count 
-        longest_page_url = clean_url
+        # converting text to lowercase and find words 
+        clean_words = re.findall(r"[a-z0-9]+", text.lower())
+
+        # counting the words from this page 
+        word_frequencies.update(clean_words)
+
+        # saving the page if its the longest so far 
+        if word_count > longest_page_words: 
+            longest_page_words = word_count 
+            longest_page_url = clean_url
     
     # extracting links from this page 
     links = extract_next_links(url, resp)
