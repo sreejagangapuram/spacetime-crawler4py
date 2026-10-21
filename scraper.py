@@ -5,11 +5,17 @@
 # keeping track of unique pages 
 visited_pages = set() 
 
+# tracking longest page 
+longest_page_url = ""
+longest_page_words = 0
+
 import re
 from urllib.parse import urlparse, urljoin, urldefrag
 from bs4 import BeautifulSoup
 
 def scraper(url, resp):
+    global longest_page_url, longest_page_words
+
     # skip pages that didnt download successfully 
     if resp.status != 200 or resp.raw_response is None: 
         return [] 
@@ -21,6 +27,24 @@ def scraper(url, resp):
     if clean_url not in visited_pages:
         visited_pages.add(clean_url)
 
+    # extracting text from the webpage 
+    soup = BeautifulSoup(resp.raw_response.content, "html.parser") 
+
+    # removing code and non-visable text 
+    for tag in soup(["script", "style", "noscript"]):
+        tag.decompose()
+
+    text = soup.get_text(separator=" ", strip=True)                 
+
+    # counting the words 
+    words = text.split() 
+    word_count = len(words) 
+
+    # saving the page if its the longest so far 
+    if word_count > longest_page_words: 
+        longest_page_words = word_count 
+        longest_page_url = clean_url
+    
     # extracting links from this page 
     links = extract_next_links(url, resp)
 
