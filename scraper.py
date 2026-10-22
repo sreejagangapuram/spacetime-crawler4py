@@ -242,5 +242,39 @@ def save_stats():
         }
     }
 
-    with open("crawler_stats.json", "w") as file:
+    # saving to a temporary file first
+    with open("crawler_stats.tmp", "w") as file:
         json.dump(stats, file, indent=4)
+
+    # replacing the old file with the completed file
+    os.replace("crawler_stats.tmp", "crawler_stats.json")
+
+# function to load saved stats 
+def load_stats():
+    global longest_page_url, longest_page_words
+
+    # checking if saved statistics exist
+    if not os.path.exists("crawler_stats.json"):
+        return
+
+    # read saved statistics
+    with open("crawler_stats.json", "r") as file:
+        stats = json.load(file)
+
+    # restoring visited pages
+    visited_pages.clear()
+    visited_pages.update(stats["visited_pages"])
+
+    # restoring longest page
+    longest_page_url = stats["longest_page_url"]
+    longest_page_words = stats["longest_page_words"]
+
+    # restoring word frequencies
+    word_frequencies.clear()
+    word_frequencies.update(stats["word_frequencies"])
+
+    # restoring subdomain pages
+    subdomain_pages.clear()
+
+    for domain, pages in stats["subdomain_pages"].items():
+        subdomain_pages[domain] = set(pages)
