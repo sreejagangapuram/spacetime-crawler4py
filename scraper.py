@@ -107,12 +107,16 @@ def scraper(url, resp):
         # counting the words from this page 
         word_frequencies.update(filtered_words)
 
-        # saving the page if its the longest so far 
-        if word_count > longest_page_words: 
-            longest_page_words = word_count 
+        # saving the page if its the longest so far
+        if word_count > longest_page_words:
+            longest_page_words = word_count
             longest_page_url = clean_url
-    
-    # extracting links from this page 
+
+        # automatically save statistics every 25 unique pages
+        if len(visited_pages) % 25 == 0:
+            save_stats()
+
+    # extracting links from this page
     links = extract_next_links(url, resp)
 
     return [link for link in links if is_valid(link)]
