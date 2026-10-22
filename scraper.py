@@ -170,6 +170,24 @@ def is_valid(url):
     try:
         parsed = urlparse(url)
 
+        # avoiding extremely long URLs
+        if len(url) > 300:
+            return False
+
+        # avoiding URLs with too many path sections
+        if len([part for part in parsed.path.split("/") if part]) > 10:
+            return False
+
+        # avoiding common calendar traps
+        path = parsed.path.lower()
+
+        if "calendar" in path or "/events/" in path:
+            return False
+
+        # avoiding URLs with too many query parameters
+        if len(parsed.query.split("&")) > 5:
+            return False
+
         # only allow links for four required UCI domains 
         # checking website's hostname before allowing the crawler to visit it 
         allowed_domains = (
