@@ -1,4 +1,4 @@
-from collections import Counter 
+from collections import Counter, defaultdict
 
 # urljoin: turns relative links into complete URLs
 # urldefrag: removes fragments such as #section1
@@ -13,6 +13,9 @@ longest_page_words = 0
 
 # counting how often each word appears 
 word_frequencies = Counter() 
+
+# counting unique pages in each ICS subdomain
+subdomain_pages = defaultdict(set)
 
 # common English stop words to ignore
 # NLTK's list of english stopwords: https://gist.github.com/sebleier/554280 
@@ -65,6 +68,16 @@ def scraper(url, resp):
     # record page if it hasnt been visted 
     if clean_url not in visited_pages:
         visited_pages.add(clean_url)
+
+        # getting the hostname of the webpage 
+        hostname = urlparse(clean_url).hostname 
+
+        # counting unique pages in each ICS subdomain
+        if hostname and (
+            hostname == "ics.uci.edu"
+            or hostname.endswith(".ics.uci.edu")
+        ): 
+            subdomain_pages[hostname].add(clean_url)
 
         # extracting text from the webpage 
         soup = BeautifulSoup(resp.raw_response.content, "html.parser") 

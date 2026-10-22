@@ -28,3 +28,8 @@ print("Stop words removed:", "the" not in crawler_scraper.word_frequencies)
 
 # showing the 50 most common words
 print("Top 50 words:", crawler_scraper.word_frequencies.most_common(50))
+
+# show unique page counts for each ICS subdomain
+for subdomain in sorted(crawler_scraper.subdomain_pages):
+    count = len(crawler_scraper.subdomain_pages[subdomain])
+    print(subdomain, count)
