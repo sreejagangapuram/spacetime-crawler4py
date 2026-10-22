@@ -55,6 +55,9 @@ import re
 from urllib.parse import urlparse, urljoin, urldefrag
 from bs4 import BeautifulSoup
 
+import json 
+import os 
+
 def scraper(url, resp):
     global longest_page_url, longest_page_words
 
@@ -203,3 +206,19 @@ def is_valid(url):
     except TypeError:
         print ("TypeError for ", parsed)
         raise
+
+# function to save stats into crawler_stats.json
+def save_stats(): 
+    stats = {
+        "visited_pages": sorted(visited_pages), 
+        "longest_page_url": longest_page_url, 
+        "longest_page_words": longest_page_words,
+        "word_frequencies": dict(word_frequencies), 
+         "subdomain_pages": {
+            domain: sorted(pages)
+            for domain, pages in subdomain_pages.items()
+        }
+    }
+
+    with open("crawler_stats.json", "w") as file:
+        json.dump(stats, file, indent=4)

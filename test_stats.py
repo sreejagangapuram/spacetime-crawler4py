@@ -33,3 +33,7 @@ print("Top 50 words:", crawler_scraper.word_frequencies.most_common(50))
 for subdomain in sorted(crawler_scraper.subdomain_pages):
     count = len(crawler_scraper.subdomain_pages[subdomain])
     print(subdomain, count)
+
+# save the statistics
+crawler_scraper.save_stats()
+print("Statistics saved successfully!")
