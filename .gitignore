@@ -116,3 +116,5 @@ crawler_stats.json
 
 crawler_stats.tmp
 frontier.shelve*
+
+.venv/

@@ -6,7 +6,6 @@ from utils import get_logger
 import scraper
 import time
 
-
 class Worker(Thread):
     def __init__(self, worker_id, config, frontier):
         self.logger = get_logger(f"Worker-{worker_id}", "Worker")
@@ -23,21 +22,20 @@ class Worker(Thread):
             if not tbd_url:
                 self.logger.info("Frontier is empty. Stopping Crawler.")
                 break
+
             resp = download(tbd_url, self.config, self.logger)
             self.logger.info(
                 f"Downloaded {tbd_url}, status <{resp.status}>, "
-                f"using cache {self.config.cache_server}.")
+                f"using cache {self.config.cache_server}."
+            )
+
             scraped_urls = scraper.scraper(tbd_url, resp)
+
             for scraped_url in scraped_urls:
                 self.frontier.add_url(scraped_url)
+
             # Save statistics before marking the URL complete
             scraper.save_stats()
 
-# save statistics before marking the URL complete
-scraper.save_stats()
-
-# mark the URL as finished
-self.frontier.mark_url_complete(tbd_url)
-
-# wait before downloading another page
-time.sleep(self.config.time_delay)
+            self.frontier.mark_url_complete(tbd_url)
+            time.sleep(self.config.time_delay)
