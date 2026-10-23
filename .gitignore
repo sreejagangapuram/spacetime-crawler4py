@@ -109,4 +109,10 @@ venv.bak/
 *.full.py
 *.shelve
 
+.DS_Store
+__pycache__/
+*.pyc
 crawler_stats.json
+
+crawler_stats.tmp
+frontier.shelve*
